@@ -3,6 +3,12 @@ import * as cheerio from "cheerio";
 import { OpenRouter } from "@openrouter/ai-sdk-provider";
 import { VectorStore } from "@/lib/vectorStore";
 
+// Configure longer timeout for Vercel
+export const config = {
+  runtime: "edge",
+  regions: ["iad1"], // Optimizes for US East (N. Virginia), can be changed as needed
+};
+
 // Simple agent to fetch and summarize web content
 class WebSummaryAgent {
   private url: string;
@@ -51,8 +57,42 @@ class WebSummaryAgent {
       // Get title
       this.title = $("title").text() || $("h1").first().text();
 
-      // Extract main text and clean it
-      this.mainText = $("body").text().replace(/\s+/g, " ").trim();
+      // Extract main text, focusing on meaningful content areas
+      // This prioritizes content in main article areas and removes scripts/styles
+      const mainContentSelectors = [
+        "article",
+        "main",
+        ".content",
+        ".article",
+        ".post",
+        ".entry-content",
+        "#content",
+        '[role="main"]',
+      ];
+
+      let mainContent = "";
+
+      // Try to get content from common content containers first
+      for (const selector of mainContentSelectors) {
+        if ($(selector).length) {
+          mainContent = $(selector).text().trim();
+          if (mainContent.length > 500) {
+            break; // Found substantial content
+          }
+        }
+      }
+
+      // If no good content found in specific areas, fall back to body
+      if (mainContent.length < 500) {
+        // Remove scripts, styles, navigation, footers, headers, sidebars
+        $(
+          "script, style, nav, header, footer, aside, .sidebar, .nav, .menu, .ad, .ads, .advertisement"
+        ).remove();
+        mainContent = $("body").text();
+      }
+
+      // Clean the text by removing excess whitespace
+      this.mainText = mainContent.replace(/\s+/g, " ").trim();
     } catch (error) {
       throw new Error(
         `Error extracting content: ${

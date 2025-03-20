@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { queryAgent } from "@/lib/queryAgent";
 
+// Configure longer timeout for Vercel
+export const config = {
+  runtime: "edge",
+  regions: ["iad1"], // Optimizes for US East (N. Virginia)
+};
+
 export async function POST(request: NextRequest) {
   try {
     const { query } = await request.json();
