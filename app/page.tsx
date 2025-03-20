@@ -301,78 +301,111 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
-      <header className="py-4 px-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <h1 className="text-xl font-bold text-center text-gray-800 dark:text-gray-200">
+      <header className="py-6 px-6 border-b border-indigo-100 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm sticky top-0 z-10">
+        <h1 className="text-2xl font-bold text-center bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
           Web Content Assistant
         </h1>
+        <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-1">
+          Analyze web content and ask questions about it
+        </p>
       </header>
 
       {/* Main chat area */}
       <main className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-3xl mx-auto space-y-4">
+        <div className="max-w-3xl mx-auto space-y-6">
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`p-4 rounded-lg ${
+              className={`p-6 rounded-xl shadow-sm transition-all duration-200 ${
                 message.type === "user"
-                  ? "bg-blue-100 dark:bg-blue-900 ml-auto"
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white ml-auto"
                   : message.type === "system"
-                  ? "bg-gray-100 dark:bg-gray-800"
+                  ? "bg-white/80 dark:bg-gray-800/80 border border-indigo-100 dark:border-gray-700"
                   : message.type === "raw-data"
-                  ? "bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700"
-                  : "bg-white dark:bg-gray-800"
+                  ? "bg-white/90 dark:bg-gray-800/90 border border-indigo-100 dark:border-gray-700"
+                  : "bg-white/80 dark:bg-gray-800/80 shadow-md border border-indigo-100 dark:border-gray-700"
               } ${message.type === "user" ? "max-w-md ml-auto" : "max-w-2xl"}`}
             >
               {message.type === "raw-data" ? (
                 <div>
-                  <div className="flex justify-between items-center mb-2">
+                  <div className="flex justify-between items-center mb-3">
                     <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       {message.id.includes("rawHtml")
                         ? "Raw HTML"
                         : "Cleaned Text"}
                     </h3>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 bg-indigo-50 dark:bg-gray-700 px-2 py-1 rounded-full">
                       {message.content.length} characters
                     </div>
                   </div>
-                  <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-auto max-h-96">
-                    <pre className="text-xs whitespace-pre-wrap break-words">
+                  <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg overflow-auto max-h-96">
+                    <pre className="text-xs whitespace-pre-wrap break-words font-mono">
                       {message.content}
                     </pre>
                   </div>
                 </div>
               ) : (
                 <>
-                  <div className="prose dark:prose-invert">
+                  <div className="prose dark:prose-invert max-w-none">
                     <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
 
                   {/* Data toggle buttons for summary responses */}
                   {message.rawHtml && message.cleanedText && (
-                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex space-x-2">
+                    <div className="mt-4 pt-4 border-t border-indigo-100 dark:border-gray-700 flex space-x-3">
                       <button
                         onClick={() => toggleRawData(message.id, "rawHtml")}
-                        className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                        className="text-xs px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center space-x-1 text-indigo-700 dark:text-indigo-300"
                       >
-                        {showRawDataId === message.id &&
-                        messages.some((m) =>
-                          m.id.startsWith(`${message.id}-rawHtml`)
-                        )
-                          ? "Hide Raw HTML"
-                          : "View Raw HTML"}
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                          />
+                        </svg>
+                        <span>
+                          {showRawDataId === message.id &&
+                          messages.some((m) =>
+                            m.id.startsWith(`${message.id}-rawHtml`)
+                          )
+                            ? "Hide Raw HTML"
+                            : "View Raw HTML"}
+                        </span>
                       </button>
                       <button
                         onClick={() => toggleRawData(message.id, "cleanedText")}
-                        className="text-xs px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                        className="text-xs px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center space-x-1 text-indigo-700 dark:text-indigo-300"
                       >
-                        {showRawDataId === message.id &&
-                        messages.some((m) =>
-                          m.id.startsWith(`${message.id}-cleanedText`)
-                        )
-                          ? "Hide Cleaned Text"
-                          : "View Cleaned Text"}
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 6h16M4 12h16M4 18h16"
+                          />
+                        </svg>
+                        <span>
+                          {showRawDataId === message.id &&
+                          messages.some((m) =>
+                            m.id.startsWith(`${message.id}-cleanedText`)
+                          )
+                            ? "Hide Cleaned Text"
+                            : "View Cleaned Text"}
+                        </span>
                       </button>
                     </div>
                   )}
@@ -385,9 +418,9 @@ export default function Home() {
       </main>
 
       {/* Input area */}
-      <footer className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+      <footer className="p-4 border-t border-indigo-100 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm sticky bottom-0">
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-          <div className="flex items-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2">
+          <div className="flex items-center rounded-full border border-indigo-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-6 py-3 shadow-sm">
             <input
               type="text"
               value={input}
@@ -397,18 +430,18 @@ export default function Home() {
                   ? "Ask a question about the analyzed content..."
                   : "Enter a URL to analyze (e.g., example.com)"
               }
-              className="flex-1 bg-transparent focus:outline-none text-gray-700 dark:text-gray-200"
+              className="flex-1 bg-transparent focus:outline-none text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"
               disabled={loading}
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="ml-4 px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
             >
               {loading ? (
-                <span className="flex items-center">
+                <>
                   <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    className="animate-spin h-4 w-4 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -427,14 +460,16 @@ export default function Home() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Processing...
-                </span>
+                  <span>Processing...</span>
+                </>
               ) : (
-                "Send"
+                <>
+                  <span>Send</span>
+                </>
               )}
             </button>
           </div>
-          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
+          <p className="mt-3 text-xs text-gray-500 dark:text-gray-400 text-center">
             {analyzedUrls.length > 0
               ? `Analyzed URLs: ${analyzedUrls.join(", ")}`
               : "Enter a URL first to analyze content"}
